@@ -43,7 +43,6 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
   };
 
   const characterCount = inputText.length;
-  const maxCharacters = 10000;
 
   const getLineCount = (text: string) => {
     const charactersPerLine = 25;
