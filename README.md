@@ -1,4 +1,27 @@
-# Getting Started with Create React App
+# ChunkMaster
+
+英語学習アプリケーション - シャドーイングと理解度テストを通じて英語力を向上させます。
+
+## Netlifyでのデプロイ
+
+このアプリケーションはNetlifyで簡単にデプロイできます。
+
+### 手動デプロイ
+
+1. このリポジトリをGitHubにプッシュ
+2. [Netlify](https://netlify.com)にアクセス
+3. "New site from Git"をクリック
+4. GitHubリポジトリを選択
+5. 以下の設定でデプロイ:
+   - Build command: `npm run build`
+   - Publish directory: `build`
+6. "Deploy site"をクリック
+
+### 自動デプロイ
+
+GitHubリポジトリと連携すると、mainブランチへのプッシュ時に自動的にデプロイされます。
+
+## ローカル開発
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
