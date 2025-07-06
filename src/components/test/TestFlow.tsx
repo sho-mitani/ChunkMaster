@@ -44,7 +44,6 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
 
   const characterCount = inputText.length;
   const maxCharacters = 10000;
-  const progressPercentage = Math.min((characterCount / maxCharacters) * 100, 100);
 
   const getLineCount = (text: string) => {
     const charactersPerLine = 25;
