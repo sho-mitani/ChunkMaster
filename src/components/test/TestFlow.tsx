@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Material, StudyLevel, StudyResult } from '../../types';
 import { createTestSession } from '../../utils/storage';
@@ -17,6 +17,8 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
   const [isCompleted, setIsCompleted] = useState(false);
   const [accuracy, setAccuracy] = useState(0);
   const [diff, setDiff] = useState<any>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const hintRef = useRef<HTMLDivElement>(null);
 
   const fullContent = material.chunks.map(chunk => chunk.content).join('\n\n');
   const hints = level === 1 ? getLineHints(material.content) : '';
@@ -25,6 +27,38 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
     const session = createTestSession(material.id, level);
     dispatch({ type: 'ADD_TEST_SESSION', payload: session });
   }, [dispatch, level, material.id]);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    const hint = hintRef.current;
+    if (!textarea || !hint || level !== 1) return;
+
+    const syncHeight = () => {
+      hint.style.height = textarea.style.height || `${textarea.offsetHeight}px`;
+    };
+
+    // 初期同期
+    syncHeight();
+
+    // MutationObserverでstyle変更を監視
+    const observer = new MutationObserver(syncHeight);
+    observer.observe(textarea, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
+
+    // マウスイベントでリサイズを検知
+    const handleMouseUp = () => {
+      setTimeout(syncHeight, 0);
+    };
+
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [level]);
 
   const handleComplete = () => {
     const comparisonResult = compareTexts(fullContent, inputText);
@@ -215,7 +249,7 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
           {level === 1 && hints && (
             <div className="animate-slideIn">
               <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">ヒント</h3>
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg h-64 sm:h-72">
+              <div ref={hintRef} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg h-80">
                 <div className="whitespace-pre-line text-blue-800 font-mono text-sm sm:text-base leading-relaxed overflow-y-auto h-full">
                   {hints}
                 </div>
@@ -226,6 +260,7 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
           <div className={level === 1 && hints ? '' : 'md:col-span-2'}>
             <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">入力欄</h3>
             <textarea
+              ref={textareaRef}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               maxLength={10000}

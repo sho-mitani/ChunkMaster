@@ -12,12 +12,45 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
   const [inputText, setInputText] = useState('');
   const [showHints, setShowHints] = useState(level === 1);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const hintRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.focus();
     }
   }, []);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    const hint = hintRef.current;
+    if (!textarea || !hint) return;
+
+    const syncHeight = () => {
+      hint.style.height = textarea.style.height || `${textarea.offsetHeight}px`;
+    };
+
+    // 初期同期
+    syncHeight();
+
+    // MutationObserverでstyle変更を監視
+    const observer = new MutationObserver(syncHeight);
+    observer.observe(textarea, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
+
+    // マウスイベントでリサイズを検知
+    const handleMouseUp = () => {
+      setTimeout(syncHeight, 0);
+    };
+
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [showHints]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(e.target.value);
@@ -90,7 +123,7 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
           {showHints && (
             <div className="animate-slideIn">
               <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">ヒント</h3>
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg h-64 sm:h-72">
+              <div ref={hintRef} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg h-64 sm:h-72">
                 <div className="whitespace-pre-line text-blue-800 font-mono text-sm sm:text-base leading-relaxed overflow-y-auto h-full">
                   {hints}
                 </div>
