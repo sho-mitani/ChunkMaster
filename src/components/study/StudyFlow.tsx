@@ -97,26 +97,26 @@ const StudyFlow: React.FC<StudyFlowProps> = ({ material, onBack }) => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       {/* ヘッダー */}
       <div className="glass shadow-2xl border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
               <button
                 onClick={handleBackToDashboard}
-                className="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors"
+                className="text-gray-600 hover:text-gray-800 px-2 sm:px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors text-sm sm:text-base flex-shrink-0"
               >
                 ← ダッシュボード
               </button>
-              <div>
-                <h1 className="text-2xl font-bold gradient-text">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-2xl font-bold gradient-text truncate">
                   {material.name}
                 </h1>
-                <div className="text-base text-gray-600 font-medium">
+                <div className="text-sm sm:text-base text-gray-600 font-medium">
                   チャンク {currentChunkIndex + 1} / {material.chunks.length} 
                   (Level {selectedLevel})
                 </div>
               </div>
             </div>
-            <div className="text-lg text-gray-600 font-semibold px-4 py-2 bg-gray-100 rounded-xl">
+            <div className="text-sm sm:text-lg text-gray-600 font-semibold px-3 sm:px-4 py-2 bg-gray-100 rounded-xl w-full sm:w-auto text-center">
               {currentPhase === 'understanding' && '理解段階'}
               {currentPhase === 'shadowing' && 'シャドーイング段階'}
               {currentPhase === 'result' && '結果確認'}

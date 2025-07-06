@@ -78,26 +78,26 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
           </div>
         )}
 
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">入力欄</h3>
+        <div className="mb-6 sm:mb-8">
+          <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">入力欄</h3>
           <textarea
             ref={textareaRef}
             value={inputText}
             onChange={handleInputChange}
             maxLength={10000}
-            className="w-full h-72 px-6 py-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 resize-y shadow-lg text-base leading-relaxed"
+            className="w-full h-64 sm:h-72 px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 resize-y shadow-lg text-base leading-relaxed"
             placeholder="ここにテキストを入力してください..."
           />
         </div>
 
-        <div className="flex justify-between items-center">
-          <div className="text-lg text-gray-600 font-medium">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="text-base sm:text-lg text-gray-600 font-medium order-2 sm:order-1">
             文字数: <span className="text-blue-600 font-bold">{inputText.length}</span>
           </div>
           <button
             onClick={handleComplete}
             disabled={!inputText.trim()}
-            className={`px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg ${
+            className={`px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-semibold text-base sm:text-lg transition-all duration-200 transform hover:scale-105 shadow-lg w-full sm:w-auto order-1 sm:order-2 ${
               inputText.trim()
                 ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-orange-500/25'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
