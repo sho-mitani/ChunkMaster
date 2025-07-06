@@ -90,6 +90,17 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
 
   const hints = showHints ? getLineHints(chunk.content) : '';
 
+  // ヒント欄の文字数に基づいて初期高さを計算
+  const calculateHintHeight = () => {
+    if (!showHints || !hints) return 288; // デフォルト高さ (h-72 = 288px)
+    const lines = hints.split('\n').length;
+    const lineHeight = 24; // font-mono text-base の行高
+    const padding = 48; // p-6 (24px * 2)
+    return Math.max(288, lines * lineHeight + padding);
+  };
+
+  const initialHeight = calculateHintHeight();
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="glass rounded-2xl shadow-2xl p-8 animate-fadeIn">
@@ -123,7 +134,7 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
           {showHints && (
             <div className="animate-slideIn">
               <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">ヒント</h3>
-              <div ref={hintRef} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg h-64 sm:h-72">
+              <div ref={hintRef} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg" style={{ height: `${initialHeight}px` }}>
                 <div className="whitespace-pre-line text-blue-800 font-mono text-sm sm:text-base leading-relaxed overflow-y-auto h-full">
                   {hints}
                 </div>
@@ -138,7 +149,8 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
               value={inputText}
               onChange={handleInputChange}
               maxLength={10000}
-              className="w-full h-64 sm:h-72 px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 resize-y shadow-lg text-base leading-relaxed"
+              className="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 resize-y shadow-lg text-base leading-relaxed"
+              style={{ height: `${initialHeight}px` }}
               placeholder="ここにテキストを入力してください..."
             />
           </div>
