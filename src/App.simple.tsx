@@ -8,7 +8,7 @@ function App() {
           ChunkMaster
         </h1>
         <p className="text-gray-600 mb-6">
-          暗記学習アプリ
+          チャンク学習アプリ
         </p>
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
           アプリケーションが正常に起動しました！
