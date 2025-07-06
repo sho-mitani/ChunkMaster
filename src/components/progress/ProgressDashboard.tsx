@@ -1,6 +1,5 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Material } from '../../types';
 import { calculateProgress, findWeakestChunks, formatTime } from '../../utils/storage';
 
 interface ProgressDashboardProps {

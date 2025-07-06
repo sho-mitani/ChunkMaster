@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Material, StudyLevel } from '../../types';
 import { createStudySession } from '../../utils/storage';
@@ -15,28 +15,16 @@ interface StudyFlowProps {
 type StudyPhase = 'dashboard' | 'understanding' | 'shadowing' | 'result';
 
 const StudyFlow: React.FC<StudyFlowProps> = ({ material, onBack }) => {
-  const { state, dispatch } = useApp();
+  const { dispatch } = useApp();
   const [currentPhase, setCurrentPhase] = useState<StudyPhase>('dashboard');
   const [currentChunkIndex, setCurrentChunkIndex] = useState(0);
   const [selectedLevel, setSelectedLevel] = useState<StudyLevel>(1);
   const [inputText, setInputText] = useState('');
-  const [studySession, setStudySession] = useState<{
-    startTime: Date;
-    currentChunkIndex: number;
-    level: StudyLevel;
-    completedChunks: number[];
-  } | null>(null);
 
   const handleStartStudy = (chunkIndex: number, level: StudyLevel) => {
     setCurrentChunkIndex(chunkIndex);
     setSelectedLevel(level);
     setInputText('');
-    setStudySession({
-      startTime: new Date(),
-      currentChunkIndex: chunkIndex,
-      level,
-      completedChunks: [],
-    });
     
     // 学習セッションを作成
     const session = createStudySession(material.id, material.chunks[chunkIndex].id, level);
@@ -63,7 +51,6 @@ const StudyFlow: React.FC<StudyFlowProps> = ({ material, onBack }) => {
       } else {
         // 全チャンク完了
         setCurrentPhase('dashboard');
-        setStudySession(null);
       }
     }
   };
@@ -75,7 +62,6 @@ const StudyFlow: React.FC<StudyFlowProps> = ({ material, onBack }) => {
 
   const handleBackToDashboard = () => {
     setCurrentPhase('dashboard');
-    setStudySession(null);
   };
 
   const currentChunk = material.chunks[currentChunkIndex];

@@ -10,7 +10,6 @@ interface ShadowingPhaseProps {
 
 const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplete }) => {
   const [inputText, setInputText] = useState('');
-  const [startTime] = useState<number>(Date.now());
   const [showHints, setShowHints] = useState(level === 1);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

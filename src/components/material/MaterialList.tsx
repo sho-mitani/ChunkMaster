@@ -75,14 +75,7 @@ const MaterialList: React.FC<MaterialListProps> = ({ onSelectMaterial, onEditMat
     }
   });
 
-  const handleSort = (option: SortOption) => {
-    if (sortBy === option) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(option);
-      setSortOrder('desc');
-    }
-  };
+
 
   if (materials.length === 0) {
     return (

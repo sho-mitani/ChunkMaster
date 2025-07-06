@@ -1,8 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { createMaterial } from '../../utils/storage';
 import { getLineHints } from '../../utils/textComparison';
-import { Material, Chunk } from '../../types';
 
 interface MaterialCreateProps {
   onBack: () => void;
@@ -166,9 +165,6 @@ const MaterialCreate: React.FC<MaterialCreateProps> = ({ onBack }) => {
                   <div className="whitespace-pre-line text-xs text-gray-500">
                     {getLineHints(chunk.content)}
                   </div>
-                  <pre style={{fontSize: '10px', color: 'red'}}>
-                    Debug: {chunk.content.split('\n').map(line => line.substring(0, 8)).join('\n')}
-                  </pre>
                 </div>
               </div>
             ))}
@@ -207,9 +203,6 @@ const MaterialCreate: React.FC<MaterialCreateProps> = ({ onBack }) => {
                       <div className="whitespace-pre-line text-xs text-gray-500">
                         {getLineHints(chunk.content)}
                       </div>
-                      <pre style={{fontSize: '10px', color: 'red'}}>
-                        Debug: {chunk.content.split('\n').map(line => line.substring(0, 8)).join('\n')}
-                      </pre>
                     </div>
                   </div>
                 ))}

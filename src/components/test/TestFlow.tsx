@@ -17,7 +17,6 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
   const [isCompleted, setIsCompleted] = useState(false);
   const [accuracy, setAccuracy] = useState(0);
   const [diff, setDiff] = useState<any>(null);
-  const [startTime] = useState(Date.now());
 
   const fullContent = material.chunks.map(chunk => chunk.content).join('\n\n');
   const hints = level === 1 ? getLineHints(material.content) : '';
@@ -25,7 +24,7 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
   useEffect(() => {
     const session = createTestSession(material.id, level);
     dispatch({ type: 'ADD_TEST_SESSION', payload: session });
-  }, []);
+  }, [dispatch, level, material.id]);
 
   const handleComplete = () => {
     const comparisonResult = compareTexts(fullContent, inputText);
@@ -35,7 +34,6 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
   };
 
   const handleResult = (result: StudyResult) => {
-    const endTime = Date.now();
     const updatedMaterial = {
       ...material,
       lastStudiedAt: new Date(),

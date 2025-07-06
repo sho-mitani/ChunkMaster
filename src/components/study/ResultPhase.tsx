@@ -13,21 +13,19 @@ interface ResultPhaseProps {
 
 const ResultPhase: React.FC<ResultPhaseProps> = ({ chunk, level, inputText, onComplete }) => {
   const { state, dispatch } = useApp();
-  const [result, setResult] = useState<StudyResult | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const comparison = compareTexts(chunk.content, inputText);
   const accuracy = comparison.accuracy;
 
   const handleResult = (selectedResult: StudyResult) => {
-    setResult(selectedResult);
     setIsProcessing(true);
     
-    // 統計データを更新
-    const currentMaterial = state.currentMaterial;
-    if (currentMaterial) {
-      const isSuccess = selectedResult === 'perfect';
-      const timeSpent = 0; // TODO: 実際の学習時間を計算
+          // 統計データを更新
+      const currentMaterial = state.currentMaterial;
+      if (currentMaterial) {
+        const isSuccess = selectedResult === 'perfect';
+        const timeSpent = 0;
       
       const updatedStatistics = updateChunkStatistics(
         chunk.statistics,

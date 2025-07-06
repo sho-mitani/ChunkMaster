@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Material, StudyLevel } from '../../types';
-import { getRecommendedReviewChunks, createTestSession, formatDate } from '../../utils/storage';
+import { getRecommendedReviewChunks, formatDate } from '../../utils/storage';
 import TestFlow from './TestFlow';
 
 interface TestDashboardProps {

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
 import { Material, StudyLevel } from '../../types';
 import { calculateProgress } from '../../utils/storage';
 
@@ -10,7 +9,6 @@ interface StudyDashboardProps {
 }
 
 const StudyDashboard: React.FC<StudyDashboardProps> = ({ material, onStartStudy, onBack }) => {
-  const { state } = useApp();
   const [currentChunkIndex, setCurrentChunkIndex] = useState(0);
   const [selectedLevel, setSelectedLevel] = useState<StudyLevel>(1);
 

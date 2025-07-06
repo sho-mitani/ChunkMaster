@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
-import { AppState, AppAction, Material, Chunk, StudySession, TestSession, ChunkStatistics } from '../types';
+import { AppState, AppAction } from '../types';
 
 const initialState: AppState = {
   materials: [],
@@ -139,7 +139,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
         dispatch({ type: 'SET_MATERIALS', payload: parsedState.materials });
       } catch (error) {
-        console.error('Failed to load saved state:', error);
+        // 保存された状態の読み込みに失敗
       }
     }
   }, []);

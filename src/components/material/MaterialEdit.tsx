@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Material, Chunk } from '../../types';
+import { Material } from '../../types';
 import { getLineHints } from '../../utils/textComparison';
 
 interface MaterialEditProps {
