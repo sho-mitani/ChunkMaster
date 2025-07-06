@@ -11,10 +11,13 @@ interface MaterialListProps {
 type SortOption = 'name' | 'createdAt' | 'updatedAt' | 'lastStudiedAt';
 
 const MaterialList: React.FC<MaterialListProps> = ({ onSelectMaterial, onEditMaterial }) => {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, exportData, importData } = useApp();
   const { materials } = state;
   const [sortBy, setSortBy] = useState<SortOption>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
 
   const handleDeleteMaterial = (material: Material) => {
     if (window.confirm(`「${material.name}」を削除しますか？`)) {
@@ -42,6 +45,49 @@ const MaterialList: React.FC<MaterialListProps> = ({ onSelectMaterial, onEditMat
       })),
     };
     dispatch({ type: 'ADD_MATERIAL', payload: duplicatedMaterial });
+  };
+
+  const handleExportData = () => {
+    setIsExporting(true);
+    try {
+      const dataStr = exportData();
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chunkmaster-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Export failed:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    setImportError(null);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        importData(content);
+        alert('データの読み込みが完了しました');
+      } catch (error) {
+        setImportError('データの読み込みに失敗しました。ファイル形式を確認してください。');
+      } finally {
+        setIsImporting(false);
+        event.target.value = '';
+      }
+    };
+    reader.readAsText(file);
   };
 
   const sortedMaterials = [...materials].sort((a, b) => {
@@ -81,10 +127,27 @@ const MaterialList: React.FC<MaterialListProps> = ({ onSelectMaterial, onEditMat
     return (
       <div className="max-w-4xl mx-auto p-4 sm:p-6">
         <div className="glass rounded-2xl shadow-2xl p-6 sm:p-8 text-center animate-fadeIn">
+          <div className="flex justify-end mb-4">
+            <label className="px-3 py-2 bg-green-500 text-white rounded-xl text-sm hover:bg-green-600 transition-colors shadow-sm cursor-pointer">
+              {isImporting ? '読込中...' : 'データ読込'}
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImportData}
+                disabled={isImporting}
+                className="hidden"
+              />
+            </label>
+          </div>
+          {importError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+              {importError}
+            </div>
+          )}
           <div className="text-4xl sm:text-6xl mb-4 sm:mb-6">📚</div>
           <h2 className="text-2xl sm:text-3xl font-bold mb-4 gradient-text">教材がありません</h2>
           <p className="text-gray-600 mb-6 text-base sm:text-lg">
-            まずは教材を作成してください。
+            まずは教材を作成するか、データを読み込んでください。
           </p>
         </div>
       </div>
@@ -96,28 +159,55 @@ const MaterialList: React.FC<MaterialListProps> = ({ onSelectMaterial, onEditMat
       <div className="glass rounded-2xl shadow-2xl p-4 sm:p-6 animate-fadeIn">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <h2 className="text-2xl sm:text-3xl font-bold gradient-text">教材一覧</h2>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-sm text-gray-600 hidden sm:inline">並び替え:</span>
-            <select
-              value={`${sortBy}-${sortOrder}`}
-              onChange={(e) => {
-                const [option, order] = e.target.value.split('-') as [SortOption, 'asc' | 'desc'];
-                setSortBy(option);
-                setSortOrder(order);
-              }}
-              className="px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm flex-1 sm:flex-initial"
-            >
-              <option value="createdAt-desc">作成日（新しい順）</option>
-              <option value="createdAt-asc">作成日（古い順）</option>
-              <option value="updatedAt-desc">更新日（新しい順）</option>
-              <option value="updatedAt-asc">更新日（古い順）</option>
-              <option value="lastStudiedAt-desc">最終学習（新しい順）</option>
-              <option value="lastStudiedAt-asc">最終学習（古い順）</option>
-              <option value="name-asc">教材名（A-Z）</option>
-              <option value="name-desc">教材名（Z-A）</option>
-            </select>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600 hidden sm:inline">並び替え:</span>
+              <select
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [option, order] = e.target.value.split('-') as [SortOption, 'asc' | 'desc'];
+                  setSortBy(option);
+                  setSortOrder(order);
+                }}
+                className="px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm flex-1 sm:flex-initial"
+              >
+                <option value="createdAt-desc">作成日（新しい順）</option>
+                <option value="createdAt-asc">作成日（古い順）</option>
+                <option value="updatedAt-desc">更新日（新しい順）</option>
+                <option value="updatedAt-asc">更新日（古い順）</option>
+                <option value="lastStudiedAt-desc">最終学習（新しい順）</option>
+                <option value="lastStudiedAt-asc">最終学習（古い順）</option>
+                <option value="name-asc">教材名（A-Z）</option>
+                <option value="name-desc">教材名（Z-A）</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleExportData}
+                disabled={isExporting}
+                className="px-3 py-2 bg-blue-500 text-white rounded-xl text-sm hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+              >
+                {isExporting ? '出力中...' : 'データ出力'}
+              </button>
+              <label className="px-3 py-2 bg-green-500 text-white rounded-xl text-sm hover:bg-green-600 transition-colors shadow-sm cursor-pointer">
+                {isImporting ? '読込中...' : 'データ読込'}
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImportData}
+                  disabled={isImporting}
+                  className="hidden"
+                />
+              </label>
+            </div>
           </div>
         </div>
+        
+        {importError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+            {importError}
+          </div>
+        )}
         
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {sortedMaterials.map((material, index) => {

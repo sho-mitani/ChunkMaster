@@ -23,6 +23,28 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
     setInputText(e.target.value);
   };
 
+  const getLineCount = (text: string) => {
+    const charactersPerLine = 25;
+    const lines = text.split('\n');
+    let totalLines = 0;
+    
+    for (const line of lines) {
+      totalLines += Math.max(1, Math.ceil(line.length / charactersPerLine));
+    }
+    
+    return totalLines;
+  };
+
+  const getManuscriptRatio = (text: string) => {
+    const lines = getLineCount(text);
+    const maxLines = 24;
+    return Math.min((lines / maxLines) * 100, 1000);
+  };
+
+  const characterCount = inputText.length;
+  const lineCount = getLineCount(inputText);
+  const manuscriptRatio = getManuscriptRatio(inputText);
+
   const handleComplete = () => {
     if (inputText.trim()) {
       onComplete(inputText);
@@ -50,10 +72,7 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
           <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-200 shadow-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-2xl font-bold text-orange-800">Level {level}</span>
-                <span className="text-orange-600 text-lg font-medium">
-                  {level === 1 ? '(ヒント付き)' : '(ヒント無し)'}
-                </span>
+                <span className="text-2xl font-bold text-orange-800">{level === 1 ? 'ヒントあり' : 'ヒントなし'}</span>
               </div>
               {level === 1 && (
                 <button
@@ -67,32 +86,36 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
           </div>
         </div>
 
-        {showHints && (
-          <div className="mb-8 animate-slideIn">
-            <h3 className="text-xl font-semibold mb-4 text-gray-800">ヒント</h3>
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200 shadow-lg">
-              <div className="whitespace-pre-line text-blue-800 font-mono text-base leading-relaxed">
-                {hints}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_29em] gap-6 mb-6 sm:mb-8">
+          {showHints && (
+            <div className="animate-slideIn">
+              <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">ヒント</h3>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg h-64 sm:h-72">
+                <div className="whitespace-pre-line text-blue-800 font-mono text-sm sm:text-base leading-relaxed overflow-y-auto h-full">
+                  {hints}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="mb-6 sm:mb-8">
-          <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">入力欄</h3>
-          <textarea
-            ref={textareaRef}
-            value={inputText}
-            onChange={handleInputChange}
-            maxLength={10000}
-            className="w-full h-64 sm:h-72 px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 resize-y shadow-lg text-base leading-relaxed"
-            placeholder="ここにテキストを入力してください..."
-          />
+          <div className={showHints ? '' : 'md:col-span-2'}>
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">入力欄</h3>
+            <textarea
+              ref={textareaRef}
+              value={inputText}
+              onChange={handleInputChange}
+              maxLength={10000}
+              className="w-full h-64 sm:h-72 px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 resize-y shadow-lg text-base leading-relaxed"
+              placeholder="ここにテキストを入力してください..."
+            />
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="text-base sm:text-lg text-gray-600 font-medium order-2 sm:order-1">
-            文字数: <span className="text-blue-600 font-bold">{inputText.length}</span>
+          <div className="text-sm sm:text-base text-gray-600 font-medium order-2 sm:order-1 space-y-1">
+            <div>文字数: <span className="text-blue-600 font-bold">{characterCount}</span></div>
+            <div>行数: <span className="text-blue-600 font-bold">{lineCount}</span></div>
+            <div>原稿用紙占有率: <span className="text-blue-600 font-bold">{manuscriptRatio.toFixed(1)}%</span></div>
           </div>
           <button
             onClick={handleComplete}

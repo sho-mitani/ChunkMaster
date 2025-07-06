@@ -46,6 +46,27 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
   const maxCharacters = 10000;
   const progressPercentage = Math.min((characterCount / maxCharacters) * 100, 100);
 
+  const getLineCount = (text: string) => {
+    const charactersPerLine = 25;
+    const lines = text.split('\n');
+    let totalLines = 0;
+    
+    for (const line of lines) {
+      totalLines += Math.max(1, Math.ceil(line.length / charactersPerLine));
+    }
+    
+    return totalLines;
+  };
+
+  const getManuscriptRatio = (text: string) => {
+    const lines = getLineCount(text);
+    const maxLines = 24;
+    return Math.min((lines / maxLines) * 100, 1000);
+  };
+
+  const lineCount = getLineCount(inputText);
+  const manuscriptRatio = getManuscriptRatio(inputText);
+
   if (isCompleted) {
     return (
       <div className="max-w-6xl mx-auto p-6">
@@ -59,9 +80,6 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
               >
                 ← 戻る
               </button>
-            </div>
-            <div className="text-sm text-gray-600 mt-2">
-              {material.name} - Level {level}
             </div>
           </div>
 
@@ -160,11 +178,11 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="mb-6">
+    <div className="max-w-4xl mx-auto p-4 sm:p-6">
+      <div className="glass rounded-2xl shadow-2xl p-6 sm:p-8 animate-fadeIn">
+        <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-800">テスト</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold gradient-text">テスト段階</h2>
             <button
               onClick={onBack}
               className="text-gray-600 hover:text-gray-800"
@@ -172,57 +190,67 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
               ← 戻る
             </button>
           </div>
-          <div className="text-sm text-gray-600 mt-2">
-            {material.name} - Level {level}
+          <p className="text-gray-600 mb-4 text-base sm:text-lg">
+            教材全体の内容を記憶に基づいて入力してください。
+          </p>
+        </div>
+
+        <div className="mb-6 sm:mb-8">
+          <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">教材名</h3>
+          <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-lg">
+            <div className="text-gray-800 leading-relaxed text-base sm:text-lg font-medium">
+              {material.name}
+            </div>
           </div>
         </div>
 
-        <div className="mb-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="font-medium text-blue-900 mb-2">テスト内容</div>
-            <div className="text-sm text-blue-800">
-              教材全体の内容を記憶に基づいて入力してください。
+        <div className="mb-6 sm:mb-8">
+          <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">学習レベル</h3>
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+              <span className="text-xl sm:text-2xl font-bold text-blue-800">{level === 1 ? 'ヒントあり' : 'ヒントなし'}</span>
             </div>
           </div>
         </div>
 
-        {level === 1 && hints && (
-          <div className="mb-6">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              <div className="text-sm text-yellow-800 font-medium mb-1">ヒント:</div>
-              <div className="text-sm text-yellow-700 whitespace-pre-line">{hints}</div>
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_29em] gap-6 mb-6 sm:mb-8">
+          {level === 1 && hints && (
+            <div className="animate-slideIn">
+              <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">ヒント</h3>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg h-64 sm:h-72">
+                <div className="whitespace-pre-line text-blue-800 font-mono text-sm sm:text-base leading-relaxed overflow-y-auto h-full">
+                  {hints}
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <label className="text-sm font-medium text-gray-700">
-              入力エリア
-            </label>
-            <div className={`text-sm ${characterCount > maxCharacters * 0.9 ? 'text-red-500' : characterCount > maxCharacters * 0.8 ? 'text-orange-500' : 'text-gray-600'}`}>
-              {characterCount} / {maxCharacters} 文字
-            </div>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-1 mb-2">
-            <div
-              className="bg-blue-500 h-1 rounded-full transition-all duration-300"
-              style={{ width: `${progressPercentage}%` }}
+          <div className={level === 1 && hints ? '' : 'md:col-span-2'}>
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">入力欄</h3>
+            <textarea
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              maxLength={10000}
+              className="w-full h-64 sm:h-72 px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 resize-y shadow-lg text-base leading-relaxed"
+              placeholder="教材全体の内容を記憶に基づいて入力してください..."
             />
           </div>
-          <textarea
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            maxLength={10000}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-96 resize-y"
-            placeholder="教材全体の内容を記憶に基づいて入力してください..."
-          />
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="text-sm sm:text-base text-gray-600 font-medium order-2 sm:order-1 space-y-1">
+            <div>文字数: <span className="text-blue-600 font-bold">{characterCount}</span></div>
+            <div>行数: <span className="text-blue-600 font-bold">{lineCount}</span></div>
+            <div>原稿用紙占有率: <span className="text-blue-600 font-bold">{manuscriptRatio.toFixed(1)}%</span></div>
+          </div>
           <button
             onClick={handleComplete}
-            className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 font-medium text-lg"
+            disabled={!inputText.trim()}
+            className={`px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-semibold text-base sm:text-lg transition-all duration-200 transform hover:scale-105 shadow-lg w-full sm:w-auto order-1 sm:order-2 ${
+              inputText.trim()
+                ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-blue-500/25'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
           >
             テスト完了
           </button>

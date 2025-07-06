@@ -40,10 +40,7 @@ const UnderstandingPhase: React.FC<UnderstandingPhaseProps> = ({ chunk, level, o
           <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">学習レベル</h3>
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
-              <span className="text-xl sm:text-2xl font-bold text-blue-800">Level {level}</span>
-              <span className="text-blue-600 text-base sm:text-lg font-medium">
-                {level === 1 ? '(ヒント付き)' : '(ヒント無し)'}
-              </span>
+              <span className="text-xl sm:text-2xl font-bold text-blue-800">{level === 1 ? 'ヒントあり' : 'ヒントなし'}</span>
             </div>
           </div>
         </div>

@@ -76,7 +76,7 @@ const TestDashboard: React.FC<TestDashboardProps> = ({ onBack }) => {
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                Level 1 (ヒント付き)
+ヒントあり
               </button>
               <button
                 onClick={() => setSelectedLevel(2)}
@@ -86,7 +86,7 @@ const TestDashboard: React.FC<TestDashboardProps> = ({ onBack }) => {
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                Level 2 (ヒント無し)
+ヒントなし
               </button>
             </div>
           </div>
@@ -200,7 +200,7 @@ const TestDashboard: React.FC<TestDashboardProps> = ({ onBack }) => {
                           {material?.name || '削除された教材'}
                         </span>
                         <span className="text-sm text-gray-600 ml-2">
-                          Level {session.level}
+                          {session.level === 1 ? 'ヒントあり' : 'ヒントなし'}
                         </span>
                       </div>
                       <div className="text-right">

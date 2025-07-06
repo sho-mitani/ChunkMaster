@@ -64,7 +64,7 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({ material, onStartStudy,
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
-                  Level 1 (ヒント付き)
+ヒントあり
                 </button>
                 <button
                   onClick={() => setSelectedLevel(2)}
@@ -74,7 +74,7 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({ material, onStartStudy,
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
-                  Level 2 (ヒント無し)
+ヒントなし
                 </button>
               </div>
             </div>
@@ -158,7 +158,7 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({ material, onStartStudy,
                   onClick={handleStartStudy}
                   className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 font-medium"
                 >
-                  学習開始 (Level {selectedLevel})
+学習開始 ({selectedLevel === 1 ? 'ヒントあり' : 'ヒントなし'})
                 </button>
               </div>
             </div>

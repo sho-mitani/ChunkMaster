@@ -10,6 +10,8 @@ const initialState: AppState = {
 const AppContext = createContext<{
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
+  exportData: () => string;
+  importData: (data: string) => void;
 } | null>(null);
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
@@ -98,6 +100,44 @@ const STORAGE_KEY = 'chunkmaster-app-state';
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
+  const exportData = () => {
+    return JSON.stringify(state, null, 2);
+  };
+
+  const importData = (data: string) => {
+    try {
+      const parsedState = JSON.parse(data);
+      parsedState.materials = parsedState.materials.map((material: any) => ({
+        ...material,
+        createdAt: new Date(material.createdAt),
+        updatedAt: new Date(material.updatedAt),
+        lastStudiedAt: material.lastStudiedAt ? new Date(material.lastStudiedAt) : undefined,
+        chunks: material.chunks.map((chunk: any) => ({
+          ...chunk,
+          statistics: {
+            ...chunk.statistics,
+            lastSuccessAt: chunk.statistics.lastSuccessAt 
+              ? new Date(chunk.statistics.lastSuccessAt) 
+              : undefined,
+          },
+        })),
+      }));
+      parsedState.studySessions = parsedState.studySessions.map((session: any) => ({
+        ...session,
+        startedAt: new Date(session.startedAt),
+        completedAt: session.completedAt ? new Date(session.completedAt) : undefined,
+      }));
+      parsedState.testSessions = (parsedState.testSessions || []).map((session: any) => ({
+        ...session,
+        scheduledAt: new Date(session.scheduledAt),
+        completedAt: session.completedAt ? new Date(session.completedAt) : undefined,
+      }));
+      dispatch({ type: 'SET_MATERIALS', payload: parsedState.materials });
+    } catch (error) {
+      throw new Error('データの読み込みに失敗しました');
+    }
+  };
+
   useEffect(() => {
     const savedState = localStorage.getItem(STORAGE_KEY);
     if (savedState) {
@@ -149,7 +189,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [state]);
 
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ state, dispatch, exportData, importData }}>
       {children}
     </AppContext.Provider>
   );
