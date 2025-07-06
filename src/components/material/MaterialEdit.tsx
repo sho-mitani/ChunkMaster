@@ -100,6 +100,7 @@ const MaterialEdit: React.FC<MaterialEditProps> = ({ material, onBack }) => {
                     <textarea
                       value={chunk.content}
                       onChange={(e) => handleChunkContentChange(index, e.target.value)}
+                      maxLength={10000}
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 h-24 resize-y"
                     />
                   </div>

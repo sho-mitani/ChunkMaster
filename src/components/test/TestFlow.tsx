@@ -43,8 +43,8 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
   };
 
   const characterCount = inputText.length;
-  const targetCharacterCount = fullContent.length;
-  const progressPercentage = Math.min((characterCount / targetCharacterCount) * 100, 100);
+  const maxCharacters = 10000;
+  const progressPercentage = Math.min((characterCount / maxCharacters) * 100, 100);
 
   if (isCompleted) {
     return (
@@ -200,8 +200,8 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
             <label className="text-sm font-medium text-gray-700">
               入力エリア
             </label>
-            <div className="text-sm text-gray-600">
-              {characterCount} / {targetCharacterCount} 文字
+            <div className={`text-sm ${characterCount > maxCharacters * 0.9 ? 'text-red-500' : characterCount > maxCharacters * 0.8 ? 'text-orange-500' : 'text-gray-600'}`}>
+              {characterCount} / {maxCharacters} 文字
             </div>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-1 mb-2">
@@ -213,6 +213,7 @@ const TestFlow: React.FC<TestFlowProps> = ({ material, level, onComplete, onBack
           <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
+            maxLength={10000}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-96 resize-y"
             placeholder="教材全体の内容を記憶に基づいて入力してください..."
           />

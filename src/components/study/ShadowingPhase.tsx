@@ -84,6 +84,7 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
             ref={textareaRef}
             value={inputText}
             onChange={handleInputChange}
+            maxLength={10000}
             className="w-full h-72 px-6 py-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 resize-y shadow-lg text-base leading-relaxed"
             placeholder="ここにテキストを入力してください..."
           />

@@ -116,6 +116,7 @@ const MaterialCreate: React.FC<MaterialCreateProps> = ({ onBack }) => {
             ref={(ref) => setTextareaRef(ref)}
             value={content}
             onChange={(e) => handleContentChange(e.target.value)}
+            maxLength={maxCharacters}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-64 resize-y"
             placeholder="長文を入力してください（最大10,000文字）"
           />
@@ -158,6 +159,7 @@ const MaterialCreate: React.FC<MaterialCreateProps> = ({ onBack }) => {
                     newChunks[index].content = e.target.value;
                     setChunks(newChunks);
                   }}
+                  maxLength={10000}
                   className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 h-20 resize-y"
                   placeholder="チャンクの内容を入力してください"
                 />
