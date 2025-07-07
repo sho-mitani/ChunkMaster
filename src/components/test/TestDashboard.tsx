@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Material, StudyLevel } from '../../types';
-import { getRecommendedReviewChunks, formatDate } from '../../utils/storage';
+import { formatDate } from '../../utils/storage';
 import TestFlow from './TestFlow';
 
 interface TestDashboardProps {
@@ -18,11 +18,6 @@ const TestDashboard: React.FC<TestDashboardProps> = ({ onBack }) => {
   const availableMaterials = materials.filter(material => 
     material.chunks.length > 0
   );
-
-  const recommendedMaterials = materials.filter(material => {
-    const recommendedChunks = getRecommendedReviewChunks(material.chunks);
-    return recommendedChunks.length > 0;
-  });
 
   const recentTestSessions = testSessions
     .filter(session => session.completedAt)
@@ -92,97 +87,50 @@ const TestDashboard: React.FC<TestDashboardProps> = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">推奨テスト教材</h3>
-            {recommendedMaterials.length > 0 ? (
-              <div className="space-y-3">
-                {recommendedMaterials.map(material => {
-                  const recommendedChunks = getRecommendedReviewChunks(material.chunks);
-                  const completedChunks = material.chunks.filter(chunk => chunk.statistics.successes > 0).length;
-                  
-                  return (
-                    <div key={material.id} className="border border-yellow-200 rounded-lg p-4 bg-yellow-50">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium text-yellow-800">{material.name}</h4>
-                        <span className="text-xs text-yellow-600 bg-yellow-200 px-2 py-1 rounded">
-                          推奨
-                        </span>
-                      </div>
-                      <div className="text-sm text-yellow-700 mb-3">
-                        テスト推奨チャンク: {recommendedChunks.length}個
-                      </div>
-                      <div className="text-sm text-yellow-700 mb-3">
-                        完了チャンク: {completedChunks} / {material.chunks.length}
-                      </div>
-                      {material.lastStudiedAt && (
-                        <div className="text-xs text-yellow-600 mb-3">
-                          最終学習: {formatDate(material.lastStudiedAt)}
-                        </div>
-                      )}
-                      <button
-                        onClick={() => handleStartTest(material, selectedLevel)}
-                        className="w-full bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600 text-sm font-medium"
-                      >
-                        テスト開始
-                      </button>
+        <div>
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">教材選択</h3>
+          {availableMaterials.length > 0 ? (
+            <div className="space-y-3">
+              {availableMaterials.map(material => {
+                const completedChunks = material.chunks.filter(chunk => chunk.statistics.successes > 0).length;
+                const totalChunks = material.chunks.length;
+                const progress = Math.round((completedChunks / totalChunks) * 100);
+                
+                return (
+                  <div key={material.id} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-medium text-gray-800">{material.name}</h4>
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-8">
-                <p>現在テストが推奨される教材はありません</p>
-                <p className="text-sm">学習を進めるとテスト推奨教材が表示されます</p>
-              </div>
-            )}
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">全教材から選択</h3>
-            {availableMaterials.length > 0 ? (
-              <div className="space-y-3">
-                {availableMaterials.map(material => {
-                  const completedChunks = material.chunks.filter(chunk => chunk.statistics.successes > 0).length;
-                  const totalChunks = material.chunks.length;
-                  const progress = Math.round((completedChunks / totalChunks) * 100);
-                  
-                  return (
-                    <div key={material.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium text-gray-800">{material.name}</h4>
-                      </div>
-                      <div className="text-sm text-gray-600 mb-2">
-                        完了チャンク: {completedChunks} / {totalChunks}
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                        <div
-                          className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                      {material.lastStudiedAt && (
-                        <div className="text-xs text-gray-500 mb-3">
-                          最終学習: {formatDate(material.lastStudiedAt)}
-                        </div>
-                      )}
-                      <button
-                        onClick={() => handleStartTest(material, selectedLevel)}
-                        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 text-sm font-medium"
-                      >
-                        テスト開始
-                      </button>
+                    <div className="text-sm text-gray-600 mb-2">
+                      完了チャンク: {completedChunks} / {totalChunks}
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-8">
-                <p>テスト可能な教材がありません</p>
-                <p className="text-sm">まずは教材を作成してください</p>
-              </div>
-            )}
-          </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                      <div
+                        className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    {material.lastStudiedAt && (
+                      <div className="text-xs text-gray-500 mb-3">
+                        最終学習: {formatDate(material.lastStudiedAt)}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => handleStartTest(material, selectedLevel)}
+                      className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 text-sm font-medium"
+                    >
+                      テスト開始
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-8">
+              <p>テスト可能な教材がありません</p>
+              <p className="text-sm">まずは教材を作成してください</p>
+            </div>
+          )}
         </div>
 
         {recentTestSessions.length > 0 && (

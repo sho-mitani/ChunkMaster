@@ -9,9 +9,10 @@ interface ResultPhaseProps {
   level: StudyLevel;
   inputText: string;
   onComplete: () => void;
+  onRetry: () => void;
 }
 
-const ResultPhase: React.FC<ResultPhaseProps> = ({ chunk, level, inputText, onComplete }) => {
+const ResultPhase: React.FC<ResultPhaseProps> = ({ chunk, level, inputText, onComplete, onRetry }) => {
   const { state, dispatch } = useApp();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -21,17 +22,21 @@ const ResultPhase: React.FC<ResultPhaseProps> = ({ chunk, level, inputText, onCo
   const handleResult = (selectedResult: StudyResult) => {
     setIsProcessing(true);
     
-          // 統計データを更新
-      const currentMaterial = state.currentMaterial;
-      if (currentMaterial) {
-        const isSuccess = selectedResult === 'perfect';
-        const timeSpent = 0;
+    // 統計データを更新
+    const currentMaterial = state.currentMaterial;
+    if (currentMaterial) {
+      const isSuccess = selectedResult === 'perfect';
+      const timeSpent = 0;
       
       const updatedStatistics = updateChunkStatistics(
         chunk.statistics,
         isSuccess,
         timeSpent
       );
+      
+      console.log('結果選択:', selectedResult, '成功:', isSuccess);
+      console.log('更新前統計:', chunk.statistics);
+      console.log('更新後統計:', updatedStatistics);
       
       // チャンク統計を更新
       dispatch({
@@ -57,14 +62,22 @@ const ResultPhase: React.FC<ResultPhaseProps> = ({ chunk, level, inputText, onCo
       }
     }
     
-    // 結果を処理して次のチャンクに進む
-    setTimeout(() => {
-      onComplete();
-    }, 1000);
+    // 結果を処理して次のチャンクに進むまたは再学習
+    if (selectedResult === 'retry') {
+      // 要再学習の場合は理解段階に戻る
+      setTimeout(() => {
+        onRetry();
+      }, 1000);
+    } else {
+      // 完璧の場合は次のチャンクに進む
+      setTimeout(() => {
+        onComplete();
+      }, 1000);
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 sm:p-6">
+    <div className="max-w-none mx-auto p-4 sm:p-6" style={{ maxWidth: '68rem' }}>
       <div className="glass rounded-2xl shadow-2xl p-6 sm:p-8 animate-fadeIn">
         <div className="mb-6 sm:mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold mb-4 gradient-text">結果確認</h2>
@@ -82,20 +95,20 @@ const ResultPhase: React.FC<ResultPhaseProps> = ({ chunk, level, inputText, onCo
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-[29rem_29rem] gap-6 sm:gap-8 mb-6 sm:mb-8 justify-center">
           <div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">正解</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">ヒント・答え欄</h3>
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 sm:p-6 border border-green-200 shadow-lg">
-              <div className="whitespace-pre-line text-green-800 text-sm sm:text-base leading-relaxed">
+              <div className="whitespace-pre-line text-green-800 font-mono text-sm sm:text-base leading-relaxed overflow-y-auto" style={{ minHeight: '20rem' }}>
                 {chunk.content}
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">あなたの入力</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">入力欄</h3>
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg">
-              <div className="whitespace-pre-line text-blue-800 text-sm sm:text-base leading-relaxed">
+              <div className="whitespace-pre-line text-blue-800 font-mono text-sm sm:text-base leading-relaxed overflow-y-auto" style={{ minHeight: '20rem' }}>
                 {inputText}
               </div>
             </div>

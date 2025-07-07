@@ -11,6 +11,7 @@ interface ShadowingPhaseProps {
 const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplete }) => {
   const [inputText, setInputText] = useState('');
   const [showHints, setShowHints] = useState(level === 1);
+  const [showAnswer, setShowAnswer] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
 
@@ -88,6 +89,10 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
     setShowHints(!showHints);
   };
 
+  const handleToggleAnswer = () => {
+    setShowAnswer(!showAnswer);
+  };
+
   const hints = showHints ? getLineHints(chunk.content) : '';
 
   // ヒント欄の文字数に基づいて初期高さを計算
@@ -102,7 +107,7 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
   const initialHeight = calculateHintHeight();
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-none mx-auto p-6" style={{ maxWidth: '68rem' }}>
       <div className="glass rounded-2xl shadow-2xl p-8 animate-fadeIn">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-4 gradient-text">シャドーイング段階</h2>
@@ -118,31 +123,39 @@ const ShadowingPhase: React.FC<ShadowingPhaseProps> = ({ chunk, level, onComplet
               <div className="flex items-center gap-3">
                 <span className="text-2xl font-bold text-orange-800">{level === 1 ? 'ヒントあり' : 'ヒントなし'}</span>
               </div>
-              {level === 1 && (
+              <div className="flex gap-2">
+                {level === 1 && (
+                  <button
+                    onClick={handleToggleHints}
+                    className="text-orange-600 hover:text-orange-800 text-sm font-medium px-4 py-2 rounded-xl hover:bg-orange-100 transition-colors"
+                  >
+                    {showHints ? 'ヒントを隠す' : 'ヒントを表示'}
+                  </button>
+                )}
                 <button
-                  onClick={handleToggleHints}
+                  onClick={handleToggleAnswer}
                   className="text-orange-600 hover:text-orange-800 text-sm font-medium px-4 py-2 rounded-xl hover:bg-orange-100 transition-colors"
                 >
-                  {showHints ? 'ヒントを隠す' : 'ヒントを表示'}
+                  {showAnswer ? '答えを隠す' : '答えを表示'}
                 </button>
-              )}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_29em] gap-6 mb-6 sm:mb-8">
-          {showHints && (
-            <div className="animate-slideIn">
-              <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">ヒント</h3>
-              <div ref={hintRef} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg" style={{ height: `${initialHeight}px` }}>
-                <div className="whitespace-pre-line text-blue-800 font-mono text-sm sm:text-base leading-relaxed overflow-y-auto h-full">
-                  {hints}
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-[29rem_29rem] gap-6 mb-6 sm:mb-8 justify-center">
+          <div className="animate-slideIn">
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">
+              {level === 1 ? 'ヒント・答え' : '答え'}
+            </h3>
+            <div ref={hintRef} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-200 shadow-lg" style={{ height: `${initialHeight}px` }}>
+              <div className="whitespace-pre-line text-blue-800 font-mono text-sm sm:text-base leading-relaxed overflow-y-auto h-full">
+                {showAnswer ? chunk.content : (level === 1 && showHints ? hints : '')}
               </div>
             </div>
-          )}
+          </div>
 
-          <div className={showHints ? '' : 'md:col-span-2'}>
+          <div>
             <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">入力欄</h3>
             <textarea
               ref={textareaRef}

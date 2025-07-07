@@ -15,7 +15,7 @@ interface StudyFlowProps {
 type StudyPhase = 'dashboard' | 'understanding' | 'shadowing' | 'result';
 
 const StudyFlow: React.FC<StudyFlowProps> = ({ material, onBack }) => {
-  const { dispatch } = useApp();
+  const { state, dispatch } = useApp();
   const [currentPhase, setCurrentPhase] = useState<StudyPhase>('dashboard');
   const [currentChunkIndex, setCurrentChunkIndex] = useState(0);
   const [selectedLevel, setSelectedLevel] = useState<StudyLevel>(1);
@@ -55,21 +55,28 @@ const StudyFlow: React.FC<StudyFlowProps> = ({ material, onBack }) => {
     }
   };
 
+  const handleRetryFromUnderstanding = () => {
+    setCurrentPhase('understanding');
+  };
+
   const handleShadowingComplete = (text: string) => {
     setInputText(text);
     setCurrentPhase('result');
   };
 
   const handleBackToDashboard = () => {
+    // 途中中断時は統計更新しない
     setCurrentPhase('dashboard');
   };
 
   const currentChunk = material.chunks[currentChunkIndex];
 
   if (currentPhase === 'dashboard') {
+    // 最新のmaterialデータを取得
+    const updatedMaterial = state.materials.find((m: any) => m.id === material.id) || material;
     return (
       <StudyDashboard
-        material={material}
+        material={updatedMaterial}
         onStartStudy={handleStartStudy}
         onBack={onBack}
       />
@@ -97,7 +104,7 @@ const StudyFlow: React.FC<StudyFlowProps> = ({ material, onBack }) => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       {/* ヘッダー */}
       <div className="glass shadow-2xl border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <div className="max-w-none mx-auto px-4 sm:px-6 py-4 sm:py-6" style={{ maxWidth: '68rem' }}>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
               <button
@@ -148,6 +155,7 @@ const StudyFlow: React.FC<StudyFlowProps> = ({ material, onBack }) => {
           level={selectedLevel}
           inputText={inputText}
           onComplete={() => handlePhaseComplete('result')}
+          onRetry={handleRetryFromUnderstanding}
         />
       )}
     </div>
